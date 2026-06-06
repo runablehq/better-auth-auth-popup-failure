@@ -61,15 +61,18 @@ Cross-Origin-Opener-Policy: same-origin-allow-popups
 
 This removes Chrome's `window.closed` COOP warnings but does not fix direct mode.
 
-## Suspected path
+## Root cause
 
-In the preview package's popup client, the successful popup token is stored only when `isEmbedded()` is true. Direct mode clears the popup token and then calls `/get-session`, relying on the popup's session cookie being available to the opener:
+The popup callback creates both `better-auth.session_token` and `better-auth.session_data`, then the popup after-hook replaces the redirect with an HTML completion `Response`.
 
-```js
-if (isEmbedded()) storePopupToken(outcome.token);
-else clearPopupToken();
+The hook attempts to replay the callback cookies with repeated `c.setCookie(...)` calls. In the final HTTP response, only `better-auth.session_data` survives; `better-auth.session_token` is missing. The popup posts the token successfully, but direct mode's subsequent cookie-authenticated `/get-session` request is signed out.
 
-const session = await $fetch("/get-session");
+This can be inspected without a browser by following the mock OAuth redirects and listing the final response's `Set-Cookie` names:
+
+```txt
+better-auth.session_data
 ```
 
-The popup itself completes successfully in both modes. Direct mode fails at the subsequent session fetch.
+Replaying every original `Set-Cookie` value directly on the returned completion `Response`, including `better-auth.session_token`, fixes direct mode with the client unchanged. The iframe bearer-token flow continues to work.
+
+The COOP review suggestion is still useful for avoiding `window.closed` warnings, but the opener documents need `Cross-Origin-Opener-Policy: same-origin-allow-popups`. The reproduction already sends it on both opener pages, and direct mode still fails until the session cookie is preserved.
