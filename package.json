@@ -1,0 +1,29 @@
+{
+  "name": "better-auth-auth-popup-failure",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"bun run dev:api\" \"bun run dev:web\"",
+    "dev:api": "tsx server.ts",
+    "dev:web": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.0.0",
+    "@vitejs/plugin-react": "5.0.4",
+    "better-auth": "https://pkg.pr.new/better-auth@4d0dbd6",
+    "concurrently": "9.2.1",
+    "hono": "4.12.18",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tsx": "4.20.6",
+    "vite": "8.0.10"
+  },
+  "devDependencies": {
+    "@types/node": "24.5.2",
+    "@types/react": "19.1.14",
+    "@types/react-dom": "19.1.9",
+    "typescript": "5.9.3"
+  }
+}
