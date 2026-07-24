@@ -1,7 +1,8 @@
 import { serve } from "@hono/node-server";
 import { betterAuth } from "better-auth";
-import { bearer, genericOAuth, oauthPopup } from "better-auth/plugins";
+import { bearer, genericOAuth } from "better-auth/plugins";
 import { Hono } from "hono";
+import { oauthPopup } from "./src/oauth-popup";
 
 const APP_PORT = Number(process.env.APP_PORT ?? "5173");
 const API_PORT = Number(process.env.API_PORT ?? "5174");
